@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Relatório Meteorológico</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Relatório Meteorológico</h1>
+
+        <form class="weather-form" id="search-form">
+            <label for="cidade">Cidade:</label>
+            <input type="text" id="cidade" placeholder="Digite o nome da cidade" required>
+            <button type="submit">Obter Clima</button>
+        </form>
+
+        <div id="weather-report"></div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $("#search-form").submit(function(event) {
+                event.preventDefault();
+
+                var apiKey = "271f7339452ba22fd7a7f2a2b6324caa";
+                var city = $("#cidade").val();
+
+                var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
+
+                $.getJSON(apiUrl, function(data) {
+                    $("#weather-report").empty();
+
+                    if (data.cod === "404") {
+                        $("#weather-report").html("<p>Cidade não encontrada.</p>");
+                        return;
+                    }
+
+                    var temperature = data.main.temp;
+                    var humidity = data.main.humidity;
+                    var windSpeed = data.wind.speed;
+                    var condition = data.weather[0].main;
+                    var iconCode = data.weather[0].icon;
+                    var iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
+
+                    $("#weather-report").html(
+                        "<p><strong>Local:</strong> " + data.name + ", " + data.sys.country + "</p>" +
+                        "<p><strong>Temperatura:</strong> " + temperature + "°C</p>" +
+                        "<p><strong>Condição:</strong> " + condition + "</p>" +
+                        "<p><strong>Umidade:</strong> " + humidity + "%</p>" +
+                        "<p><strong>Velocidade do Vento:</strong> " + windSpeed + " m/s</p>" +
+                        "<img id='weather-icon' src='" + iconUrl + "' alt='Condição do Tempo'>"
+                    );
+                }).fail(function() {
+                    $("#weather-report").html("<p>Erro ao obter dados meteorológicos.</p>");
+                });
+            });
+        });
+    </script>
+</body>
+</html>
